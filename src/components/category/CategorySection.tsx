@@ -34,13 +34,17 @@ export function CategorySection({ category }: { category: Category }) {
       ) : !data ? (
         <View style={styles.grid}>
           {[0, 1, 2, 3].map((i) => (
-            <ArticleCardSkeleton key={i} />
+            <View key={i} style={styles.gridItem}>
+              <ArticleCardSkeleton />
+            </View>
           ))}
         </View>
       ) : (
         <View style={styles.grid}>
           {data.articles.map((a) => (
-            <ArticleCard key={a.id} article={a} />
+            <View key={a.id} style={styles.gridItem}>
+              <ArticleCard article={a} />
+            </View>
           ))}
         </View>
       )}
@@ -53,5 +57,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.lg,
+  },
+  // Pembatas lebar kartu: tanpa flexBasis/maxWidth, kartu membesar mengikuti
+  // ukuran intrinsik gambar cover sehingga satu card bisa sebaris penuh.
+  gridItem: {
+    flexBasis: '30%',
+    flexGrow: 1,
+    flexShrink: 1,
+    minWidth: 260,
+    maxWidth: 420,
   },
 });
