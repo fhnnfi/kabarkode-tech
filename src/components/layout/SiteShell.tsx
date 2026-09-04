@@ -55,11 +55,12 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
 
 const styles = StyleSheet.create({
   root: {
-    flex: 1,
     backgroundColor: colors.bg,
     // '100%' tidak resolve di web (tinggi #root tidak fixed). react-native-web
     // menerima '100vh' saat runtime; tipe RN inti belum mengeksposenya.
     minHeight: '100vh' as unknown as number,
   },
-  main: { flex: 1 },
+  // flexGrow SAJA — `flex: 1` RNWeb = flexBasis 0% yang mengunci tinggi
+  // kontainer se-viewport dan membuat konten meluber di bawah footer.
+  main: { flexGrow: 1 },
 });
