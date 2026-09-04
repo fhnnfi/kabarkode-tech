@@ -53,7 +53,7 @@ export function ArticleCard({
         accessibilityLabel={article.title}
       >
         <View style={styles.rowCover}>
-          <ArticleCover ratio={4 / 3} compact title={article.title} />
+          <ArticleCover mediaId={article.cover_media_id} ratio={4 / 3} compact title={article.title} />
         </View>
         <View style={styles.rowBody}>
           <CategoryBadge name={article.category?.name} />
@@ -78,7 +78,7 @@ export function ArticleCard({
       accessibilityRole="link"
       accessibilityLabel={article.title}
     >
-      <ArticleCover ratio={16 / 9} compact title={article.title} />
+      <ArticleCover mediaId={article.cover_media_id} ratio={16 / 9} compact title={article.title} />
       <View style={styles.cardBody}>
         <CategoryBadge name={article.category?.name} />
         <Text style={styles.cardTitle} numberOfLines={3}>{article.title}</Text>

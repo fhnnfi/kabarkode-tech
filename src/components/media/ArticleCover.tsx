@@ -1,33 +1,52 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Image } from 'expo-image';
 import { colors, radii, typography } from '@/theme';
 import { Logo } from '@/components/common/Logo';
+import { useMedia } from '@/services/queries';
 
 /**
- * Area cover artikel. Backend publik tidak menyediakan URL cover
- * (GET /media/:id butuh auth — lihat utils/media.ts), jadi selalu tampil
- * fallback brand K</> (§61). Bila nanti backend membuka URL cover publik,
- * cukup ganti komponen ini — pemakaian di kartu tidak berubah.
+ * Area cover artikel. Bila ada `mediaId`, URL di-resolve via
+ * GET /media/:id (kini publik di backend) dan digambar dengan expo-image
+ * (lazy + fade). Tanpa cover / gagal muat: fallback brand K</> (§61).
  */
 export function ArticleCover({
+  mediaId,
   ratio = 16 / 9,
   compact = false,
   title,
 }: {
+  mediaId?: string | null;
   ratio?: number;
   compact?: boolean;
   title?: string;
 }) {
+  const { data: media } = useMedia(mediaId);
+  const [failed, setFailed] = React.useState(false);
+  const uri = media?.public_url && !failed ? media.public_url : null;
+
+  if (uri) {
+    return (
+      <View style={[styles.wrap, { aspectRatio: ratio }]} accessibilityLabel={`Sampul: ${title ?? ''}`}>
+        <Image
+          source={{ uri }}
+          style={styles.img}
+          contentFit="cover"
+          transition={250}
+          recyclingKey={uri}
+          onError={() => setFailed(true)}
+        />
+      </View>
+    );
+  }
+
   return (
     <View
       style={[styles.wrap, { aspectRatio: ratio }]}
       accessibilityLabel={title ? `Sampul artikel: ${title}` : 'Sampul KabarKode'}
     >
-      <View style={styles.grid} />
       <Logo size={compact ? 28 : 44} />
-      {!compact && (
-        <Text style={styles.word}>KABARKODE</Text>
-      )}
+      {!compact && <Text style={styles.word}>KABARKODE</Text>}
     </View>
   );
 }
@@ -43,11 +62,7 @@ const styles = StyleSheet.create({
     gap: 8,
     overflow: 'hidden',
   },
-  grid: {
-    position: 'absolute',
-    inset: 0,
-    opacity: 0.5,
-  },
+  img: { width: '100%', height: '100%' },
   word: {
     fontFamily: typography.families.mono,
     fontSize: 11,

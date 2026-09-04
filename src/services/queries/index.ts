@@ -10,6 +10,7 @@ import {
   type ArticlePage,
 } from '@/services/api/articles';
 import { listCategories, listTags } from '@/services/api/categories';
+import { getMedia } from '@/services/api/media';
 import type { ArticleListParams } from '@/types/api';
 
 export const queryKeys = {
@@ -69,6 +70,16 @@ export function useTags() {
     queryKey: queryKeys.tags(),
     queryFn: () => listTags(100),
     staleTime: STALE_LIST,
+  });
+}
+
+/** Metadata media by ID (publik) — untuk resolve cover/avatar. */
+export function useMedia(id: string | null | undefined) {
+  return useQuery({
+    queryKey: ['media', id],
+    queryFn: () => getMedia(id!),
+    enabled: !!id,
+    staleTime: 24 * 3600_000, // media praktis immutable
   });
 }
 

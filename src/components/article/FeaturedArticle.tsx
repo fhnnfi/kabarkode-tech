@@ -17,7 +17,7 @@ export function FeaturedArticle({ article }: { article: Article }) {
       accessibilityRole="link"
       accessibilityLabel={`Artikel unggulan: ${article.title}`}
     >
-      <ArticleCover ratio={16 / 9} title={article.title} />
+      <ArticleCover mediaId={article.cover_media_id} ratio={16 / 9} title={article.title} />
       <View style={styles.body}>
         <View style={styles.kicker}>
           <View style={styles.accentLine} />

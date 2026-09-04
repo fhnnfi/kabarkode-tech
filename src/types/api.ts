@@ -57,6 +57,19 @@ export interface Tag {
   updated_at: string;
 }
 
+/** Metadata media (GET /media/:id — publik). */
+export interface Media {
+  id: string;
+  file_name: string;
+  object_key: string;
+  mime_type: string;
+  size: number;
+  bucket: string;
+  public_url: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ApiMeta {
   page: number;
   limit: number;

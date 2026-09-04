@@ -1,14 +1,13 @@
 /**
  * Penanganan media (§27–28).
  *
- * FAKTA backend (diverifikasi): respons artikel publik hanya memuat
- * `cover_media_id`; `GET /media/:id` butuh token staff/author sehingga
- * situs publik TIDAK bisa resolve URL cover. Backend tidak boleh diubah.
+ * GET /media/:id kini PUBLIK di backend (hanya metadata) sehingga situs
+ * publik bisa resolve `cover_media_id` -> `public_url` (cdn.fhanalabs.site)
+ * tanpa auth. Lihat services/api/media.ts + components/media/ArticleCover.tsx.
  *
- * Keputusan: cover memakai fallback brand K</> (§61). Gambar INLINE di
- * konten artikel tetap tampil karena HTML hasil CMS sudah berisi URL
- * publik cdn.fhanalabs.site. Domain media tidak pernah di-hard-code.
+ * Domain media tidak pernah di-hard-code — URL selalu dari respons backend.
+ * Fallback brand K</> dipakai bila artikel tanpa cover atau URL gagal dimuat.
  */
-export function hasPublicCover(): false {
-  return false;
+export function isPublicImageUrl(url: string | null | undefined): boolean {
+  return !!url && /^https?:\/\//i.test(url);
 }

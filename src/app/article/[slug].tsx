@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, Animated, ScrollView } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { router } from 'expo-router';
 import { colors, radii, spacing, typography, layout } from '@/theme';
@@ -15,6 +15,7 @@ import { SectionHeader } from '@/components/common/SectionHeader';
 import { ErrorState } from '@/components/common/States';
 import { SkeletonBlock } from '@/components/common/LoadingSkeleton';
 import { useArticle, useRelatedArticles } from '@/services/queries';
+import { useReadingProgress } from '@/hooks/useReadingProgress';
 import { usePageHead, canonicalUrl } from '@/hooks/usePageHead';
 import { formatDateId } from '@/utils/date';
 import { estimateReadingMinutes, htmlToPlainText } from '@/utils/reading';
@@ -58,15 +59,8 @@ export default function ArticlePage() {
       : undefined,
   });
 
-  // Progress baca tipis di atas konten (§34).
-  const scrollY = React.useRef(new Animated.Value(0)).current;
-  const [contentH, setContentH] = React.useState(0);
-  const progress = scrollY.interpolate({
-    inputRange: [0, Math.max(contentH - layout.headerHeight, 1)],
-    outputRange: [0, 1],
-    extrapolate: 'clamp',
-  });
-  const widthAnim = progress.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] });
+  // Progress baca tipis — dihitung dari scroll document (hook terisolasi web).
+  const progress = useReadingProgress();
 
   if (isLoading) {
     return (
@@ -104,16 +98,9 @@ export default function ArticlePage() {
   return (
     <SiteShell>
       <View style={styles.progressTrack}>
-        <Animated.View style={[styles.progressBar, { width: widthAnim }]} />
+        <View style={[styles.progressBar, { width: `${Math.round(progress * 100)}%` }]} />
       </View>
-      <ScrollView
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false },
-        )}
-        scrollEventThrottle={16}
-        onContentSizeChange={(_w, h) => setContentH(h)}
-      >
+      <View>
         <Container narrow style={styles.article}>
           {/* Breadcrumb */}
           <View style={styles.crumbs}>
@@ -158,7 +145,7 @@ export default function ArticlePage() {
             </Text>
           </View>
 
-          <ArticleCover ratio={16 / 9} title={article.title} />
+          <ArticleCover mediaId={article.cover_media_id} ratio={16 / 9} title={article.title} />
 
           <ArticleContent html={article.content} />
 
@@ -200,14 +187,15 @@ export default function ArticlePage() {
             </View>
           </Container>
         )}
-      </ScrollView>
+      </View>
     </SiteShell>
   );
 }
 
 const styles = StyleSheet.create({
   progressTrack: {
-    position: 'absolute',
+    // Sticky tepat di bawah header — ikut saat halaman di-scroll document.
+    position: 'sticky' as unknown as 'relative',
     top: layout.headerHeight,
     left: 0,
     right: 0,

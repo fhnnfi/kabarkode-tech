@@ -39,13 +39,12 @@ source_url, published_at, created_at, updated_at` + relasi inline
 
 ### Catatan penting: cover image
 
-`GET /media/:id` backend membutuhkan token staff/author, sehingga situs publik
-TIDAK bisa resolve URL cover dari `cover_media_id`. Sesuai aturan "jangan ubah
-backend", kartu artikel memakai **fallback brand K</>** (`src/utils/media.ts`).
-Gambar inline di konten artikel tetap tampil normal karena HTML dari CMS sudah
-memuat URL publik `cdn.fhanalabs.site`. Bila nanti backend membuka endpoint
-media publik, cukup ganti `ArticleCover` — pemakaian di komponen lain tidak
-berubah.
+`GET /media/:id` kini publik di backend (hanya metadata), sehingga frontend
+resolve `cover_media_id` → `public_url` (cdn.fhanalabs.site) tanpa auth —
+lihat `services/api/media.ts` + `useMedia()`. Kartu/artikel menampilkan gambar
+nyata via `expo-image` (lazy + fade); artikel tanpa cover atau saat URL gagal
+dimuat memakai fallback brand K</> (`ArticleCover`). Domain media tidak pernah
+di-hard-code; URL selalu dari respons backend.
 
 ### Catatan penting: search & related
 
