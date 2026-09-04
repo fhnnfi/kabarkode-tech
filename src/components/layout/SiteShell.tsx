@@ -39,7 +39,9 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: colors.bg,
-    minHeight: '100%',
+    // '100%' tidak resolve di web (tinggi #root tidak fixed). react-native-web
+    // menerima '100vh' saat runtime; tipe RN inti belum mengeksposenya.
+    minHeight: '100vh' as unknown as number,
   },
   main: { flex: 1 },
 });
