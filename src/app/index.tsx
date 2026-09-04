@@ -37,7 +37,10 @@ export default function HomePage() {
   const articles = latest?.articles ?? [];
   const featured = articles[0];
   const secondary = articles.slice(1, 3);
-  const latestRest = articles.slice(3, 11);
+  // Terbaru: artikel setelah featured. Bila feed pendek (<=3 artikel),
+  // pakai artikel hero sisi-2 agar section tidak kosong (berita kecil
+  // memang muncul dua kali — pola umum situs berita).
+  const latestRest = articles.length > 3 ? articles.slice(3, 11) : articles.slice(1, 3);
   const homeCategories = categories.slice(0, 3);
 
   return (
@@ -108,8 +111,8 @@ export default function HomePage() {
         </Container>
       )}
 
-      {/* More articles (load more) */}
-      {articles.length > 0 && (
+      {/* More articles (load more) — sembunyi bila halaman berikutnya kosong */}
+      {articles.length > 0 && (more.data?.articles.length ?? 0) > 0 && (
         <Container style={styles.section}>
           <SectionHeader title="Berita Lainnya" index="03" />
           <View style={styles.grid}>
